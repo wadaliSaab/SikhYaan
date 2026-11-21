@@ -12,10 +12,8 @@ export default async function Page({ params }: { params: Promise<{ referenceId: 
   if (!content || !content.isActive) notFound();
   return (
     <div className="  min-w-0 h-dvh w-full min-h-0 flex flex-col  bg-text-background/30" >
-       <Header    subtitle="learn build gain" />
-
-     
-      <ContentReader content={content} />
+      <Header    subtitle="learn build gain"/>
+      <ContentReader content={content}/>
     </div>
   );
 }

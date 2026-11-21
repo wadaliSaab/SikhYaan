@@ -8,11 +8,11 @@ import AppButton from "@/components/ui/AppButton";
 import AppText from "@/components/ui/AppText";
 
 const navButtons = [
-  { label: "Sikh Gurus", href: "/sikh-gurus" },
-  { label: "Granth Sahib ji", href: "/sikh-history" },
+  { label: "Sikh Gurus", href: "/SG-CPW3" },
+  { label: "Granth Sahib ji", href: "/SGGSJ-S4CC" },
   { label: "Doubt", href: "/doubt" },
   { label: "Gyaan", href: "/gyaan/test" },
-  {label : "Sikh History" , href:"/"}
+  {label : "Sikh History" , href:"/WITS-VFKK"}
 ];
 
 export default function Header() {

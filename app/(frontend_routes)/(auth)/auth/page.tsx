@@ -5,7 +5,7 @@ export default function AuthPage() {
    
     <main className="bg-background/70 flex h-dvh w-full min-w-0 overflow-y-auto hide-scrollbar">
       <div className="m-auto w-full ">
-        <SikhYaanAuthPage />
+        <SikhYaanAuthPage/>
       </div>
     </main>
   );
