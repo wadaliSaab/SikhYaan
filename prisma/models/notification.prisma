@@ -1,0 +1,55 @@
+enum NotificationType {
+  CONTENT_ADDED
+  CONTENT_UPDATED 
+  TEST_ADDED
+  DOUBT_REPLY
+  REPLY_TO_REPLY
+  DOUBT_RESOLVED
+  DOUBT_PINNED
+  NEW_DOUBT
+  ROLE_REQUEST
+  ROLE_APPROVED
+  ROLE_DECLINED
+  SYSTEM
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String? 
+  type      NotificationType
+  title     String
+  message   String
+  read      Boolean          @default(false) 
+  createdAt DateTime         @default(now())
+
+  doubtId       String?
+  replyId       String?
+  contentItemId String?
+  testId        String?
+  roleRequestId String?
+
+  user        User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  doubt       Doubt?       @relation(fields: [doubtId], references: [id], onDelete: Cascade)
+  reply       Reply?       @relation(fields: [replyId], references: [id], onDelete: Cascade)
+  contentItem ContentItem? @relation(fields: [contentItemId], references: [id], onDelete: Cascade)
+  test        GyaanTest?   @relation(fields: [testId], references: [id], onDelete: Cascade)
+  roleRequest RoleRequest? @relation(fields: [roleRequestId], references: [id], onDelete: Cascade)
+
+  reads NotificationRead[]
+
+  @@index([userId, read, createdAt])
+  @@index([userId, createdAt])
+  @@index([createdAt])
+}
+
+model NotificationRead {
+  userId         String
+  notificationId String
+  createdAt      DateTime @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@id([userId, notificationId])
+  @@index([notificationId])
+}

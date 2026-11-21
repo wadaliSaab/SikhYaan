@@ -1,0 +1,57 @@
+model ContentItem {
+  id           String            @id @default(uuid())
+  referenceId  String            @unique
+  title        String
+  parentId     String?
+  heroMediaId  String?           @unique
+  sortOrder    Int               @default(0)
+  isActive     Boolean           @default(true)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  summary      String?
+  blocks       ContentBlock[]
+  heroMedia    Media?            @relation("ContentHeroMedia", fields: [heroMediaId], references: [id])
+  parent       ContentItem?      @relation("ContentHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children     ContentItem[]     @relation("ContentHierarchy")
+  homeSections HomeSectionItem[]
+
+  referencedByDoubts Doubt[] @relation("DoubtReferencedContent")
+  notifications Notification[]
+
+  @@index([parentId])
+}
+
+model ContentBlock {
+  id            String           @id @default(uuid())
+  contentItemId String
+  type          ContentBlockType
+  content       String?
+  sortOrder     Int              @default(0)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  mediaId       String?
+  title         String?
+  contentItem   ContentItem      @relation(fields: [contentItemId], references: [id], onDelete: Cascade)
+  media         Media?           @relation("BlockMedia", fields: [mediaId], references: [id])
+  galleryItems  GalleryItem[]
+
+  @@index([contentItemId])
+}
+
+model GalleryItem {
+  id             String       @id @default(uuid())
+  contentBlockId String
+  mediaId        String
+  sortOrder      Int          @default(0)
+  contentBlock   ContentBlock @relation(fields: [contentBlockId], references: [id], onDelete: Cascade)
+  media          Media        @relation(fields: [mediaId], references: [id])
+
+  @@index([contentBlockId])
+}
+
+enum ContentBlockType {
+  TEXT
+  IMAGE
+  PDF
+  GALLERY
+}

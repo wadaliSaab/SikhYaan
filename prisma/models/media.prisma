@@ -1,0 +1,21 @@
+model Media {
+  id                 String               @id @default(uuid())
+  type               MediaType
+  fileKey            String               @unique
+  fileName           String
+  mimeType           String
+  size               Int
+  createdAt          DateTime             @default(now())
+  block              ContentBlock[]       @relation("BlockMedia")
+  heroFor            ContentItem?         @relation("ContentHeroMedia")
+  doubtImages        DoubtImage[]
+  userAvatar         User?                @relation("UserAvatar")
+  galleryItems       GalleryItem[]
+  gyaanQuestions     GyaanQuestion[]      @relation("GyaanQuestionImage")
+  gyaanAttemptImages GyaanAttemptAnswer[] @relation("GyaanAttemptAnswerImage")
+}
+
+enum MediaType {
+  IMAGE
+  PDF
+}

@@ -1,0 +1,44 @@
+model HomeSection {
+  id          String            @id @default(uuid())
+  referenceId String            @unique
+  title       String
+  layout      SectionLayout
+  itemVariant ItemVariant
+  mediaRatio  MediaRatio
+  sortOrder   Int
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  items       HomeSectionItem[]
+}
+
+model HomeSectionItem {
+  id            String      @id @default(uuid())
+  homeSectionId String
+  contentItemId String
+  sortOrder     Int         @default(0)
+  contentItem   ContentItem @relation(fields: [contentItemId], references: [id], onDelete: Cascade)
+  homeSection   HomeSection @relation(fields: [homeSectionId], references: [id])
+
+  @@unique([homeSectionId, contentItemId])
+  @@index([contentItemId])
+}
+
+enum SectionLayout {
+  GRID
+  LIST
+  FEATURE
+}
+
+enum ItemVariant {
+  IMAGE_CARD
+  IMAGE_CARD_LARGE
+  COMPACT_CARD
+  PDF_CARD
+}
+
+enum MediaRatio {
+  SQUARE
+  LANDSCAPE
+  PORTRAIT
+}

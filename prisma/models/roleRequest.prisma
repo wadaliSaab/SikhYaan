@@ -1,0 +1,21 @@
+model RoleRequest {
+  id              String            @id @default(uuid())
+  userId          String
+  requestedRoleId String
+  status          RoleRequestStatus @default(PENDING)
+  reviewedById    String?
+  reviewedAt      DateTime?
+  reviewNote      String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  notifications Notification[]
+  requestedRole   Role              @relation("RequestedRole", fields: [requestedRoleId], references: [id])
+  reviewedBy      User?             @relation("ReviewedRoleRequests", fields: [reviewedById], references: [id])
+  user            User              @relation("UserRoleRequests", fields: [userId], references: [id])
+}
+
+enum RoleRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

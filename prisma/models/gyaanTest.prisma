@@ -1,0 +1,150 @@
+enum GyaanTestStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum GyaanQuestionType {
+  MCQ
+  FILL
+  IMAGE
+}
+
+enum GyaanDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum GyaanAttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  TIMED_OUT
+  ABANDONED
+}
+
+model GyaanTest {
+  id              String          @id @default(uuid())
+  title           String
+  description     String?
+  category        String
+  difficulty      GyaanDifficulty @default(BEGINNER)
+  durationMinutes Int
+  status          GyaanTestStatus @default(DRAFT)
+  notifications Notification[]
+  createdById String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+
+  createdBy User            @relation("GyaanTestCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  questions GyaanQuestion[]
+  attempts  GyaanAttempt[]
+
+  @@index([createdById])
+  @@index([status, category])
+  @@index([createdAt])
+}
+
+model GyaanQuestion {
+  id          String @id @default(uuid())
+  testId      String
+  createdById String
+
+  type  GyaanQuestionType
+  text  String
+  marks Int               @default(1)
+  order Int
+
+  options            String[] @default([])
+  correctOptionIndex Int?
+  correctAnswer      String?
+
+  imageMediaId String?
+  image        Media?  @relation("GyaanQuestionImage", fields: [imageMediaId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  test      GyaanTest            @relation(fields: [testId], references: [id], onDelete: Cascade)
+  createdBy User                 @relation("GyaanQuestionCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  answers   GyaanAttemptAnswer[]
+
+  @@unique([testId, order])
+  @@index([createdById])
+  @@index([testId])
+  @@index([imageMediaId])
+}
+
+model GyaanAttempt {
+  id     String @id @default(uuid())
+  userId String
+  testId String
+
+  testTitleSnapshot       String
+  categorySnapshot        String
+  difficultySnapshot      GyaanDifficulty
+  durationMinutesSnapshot Int
+  questionCount           Int
+  totalMarks              Int
+
+  score             Int   @default(0)
+  correctAnswers    Int   @default(0)
+  wrongAnswers      Int   @default(0)
+  unansweredAnswers Int   @default(0)
+  percentage        Float @default(0)
+
+  status           GyaanAttemptStatus @default(IN_PROGRESS)
+  startedAt        DateTime           @default(now())
+  expiresAt        DateTime
+  submittedAt      DateTime?
+  timeTakenSeconds Int?
+
+  user    User                 @relation("GyaanAttemptUser", fields: [userId], references: [id], onDelete: Restrict)
+  test    GyaanTest            @relation(fields: [testId], references: [id], onDelete: Restrict)
+  answers GyaanAttemptAnswer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, startedAt])
+  @@index([testId, startedAt])
+  @@index([userId, testId])
+  @@index([status, expiresAt])
+}
+
+model GyaanAttemptAnswer {
+  id         String  @id @default(uuid())
+  attemptId  String
+  questionId String?
+
+  order                Int
+  questionTypeSnapshot GyaanQuestionType
+  questionTextSnapshot String
+  marksPossible        Int
+  optionsSnapshot      String[]          @default([])
+
+  correctOptionIndexSnapshot Int?
+  correctAnswerSnapshot      String?
+
+  imageMediaIdSnapshot String?
+  imageSnapshot        Media?  @relation("GyaanAttemptAnswerImage", fields: [imageMediaIdSnapshot], references: [id], onDelete: Restrict)
+
+  selectedOptionIndex Int?
+  answerText          String?
+  answeredAt          DateTime?
+
+  isCorrect    Boolean?
+  marksAwarded Int      @default(0)
+
+  attempt  GyaanAttempt   @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question GyaanQuestion? @relation(fields: [questionId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([attemptId, order])
+  @@index([questionId])
+  @@index([attemptId])
+  @@index([imageMediaIdSnapshot])
+}
